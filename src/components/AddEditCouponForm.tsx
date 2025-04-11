@@ -52,6 +52,7 @@ const AddEditCouponForm: React.FC<AddEditCouponFormProps> = ({ isOpen, onClose, 
 
   useEffect(() => {
     if (coupon) {
+      // When editing, provide all required fields from the existing coupon
       form.reset({
         id: coupon.id,
         name: coupon.name,
@@ -63,15 +64,16 @@ const AddEditCouponForm: React.FC<AddEditCouponFormProps> = ({ isOpen, onClose, 
         discountType: coupon.discountType,
       });
     } else {
+      // For new coupons, ensure all required fields have default values
       form.reset({
         id: undefined,
-        name: '',
-        code: '',
-        description: '',
-        startDate: new Date().toISOString().split('T')[0],
-        endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
-        discountValue: 0,
-        discountType: 'percentage',
+        name: '',  // Required field with empty string default
+        code: '',  // Required field with empty string default
+        description: '',  // Required field with empty string default
+        startDate: new Date().toISOString().split('T')[0],  // Required field with today's date
+        endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0], // Required field with future date
+        discountValue: 0,  // Required field with numeric default
+        discountType: 'percentage' as const,  // Required field with type assertion
       });
     }
   }, [coupon, form, isOpen]);
