@@ -33,10 +33,13 @@ const formSchema = z.object({
   discountType: z.enum(['percentage', 'fixed']),
 });
 
+// Define the type for our form values based on the schema
+type FormValues = z.infer<typeof formSchema>;
+
 const AddEditCouponForm: React.FC<AddEditCouponFormProps> = ({ isOpen, onClose, onSave, coupon }) => {
   const isEditing = !!coupon;
   
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       id: '',
@@ -46,7 +49,7 @@ const AddEditCouponForm: React.FC<AddEditCouponFormProps> = ({ isOpen, onClose, 
       startDate: new Date().toISOString().split('T')[0],
       endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
       discountValue: 0,
-      discountType: 'percentage',
+      discountType: 'percentage' as const,
     },
   });
 
@@ -78,8 +81,9 @@ const AddEditCouponForm: React.FC<AddEditCouponFormProps> = ({ isOpen, onClose, 
     }
   }, [coupon, form, isOpen]);
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    onSave(values);
+  const onSubmit = (values: FormValues) => {
+    // All values from the form are guaranteed to match our schema
+    onSave(values as Omit<Coupon, 'id'> & { id?: string });
     toast({
       title: isEditing ? "Coupon updated" : "Coupon created",
       description: `${values.name} has been ${isEditing ? "updated" : "created"} successfully.`,
